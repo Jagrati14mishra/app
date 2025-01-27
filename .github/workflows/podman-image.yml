@@ -18,20 +18,27 @@ jobs:
           sudo apt update
           sudo apt install -y podman
 
+      - name: Configure Podman
+        run: |
+          mkdir -p $HOME/.config/containers
+          echo -e "[engine]\ncgroup_manager = \"cgroupfs\"\nevents_logger = \"file\"" > $HOME/.config/containers/containers.conf
+          systemctl --user enable --now podman
+
       - name: Build Docker Image using Podman
         run: |
-          podman build -t python-docker-app:latest .
-      
+          podman build --storage-driver=vfs -t python-docker-app:latest .
+
       - name: Install Trivy
         run: |
-          sudo apt install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
-          tar -xvf trivy_Linux-64bit.tar.gz
-          sudo mv trivy /usr/local/bin/
+          sudo apt update
+          sudo apt install -y wget curl
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh
 
       - name: Scan Docker Image with Trivy
         run: |
+          export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"
           trivy image python-docker-app:latest
+
 
         
 
