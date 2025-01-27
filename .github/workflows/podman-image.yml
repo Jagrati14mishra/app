@@ -26,7 +26,7 @@ jobs:
 
       - name: Build Docker Image using Podman
         run: |
-          podman build --storage-driver=vfs -t python-docker-app:latest .
+          podman build -t python-docker-app:latest .
 
       - name: Install Trivy
         run: |
