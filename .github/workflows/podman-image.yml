@@ -28,14 +28,15 @@ jobs:
         run: |
           podman build -t python-docker-app:latest .
 
-      - name: Install Trivy
+        - name: Install Trivy
         run: |
           sudo apt update
           sudo apt install -y wget curl
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh
-          sudo mv trivy /usr/local/bin/
+          sudo install -m 0755 ./bin/trivy /usr/local/bin/trivy
           echo "PATH=$PATH:/usr/local/bin" >> $GITHUB_ENV
           trivy --version  # Verify installation
+
 
       - name: Scan Docker Image with Trivy
         run: |
