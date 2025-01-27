@@ -33,10 +33,12 @@ jobs:
           sudo apt update
           sudo apt install -y wget curl
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh
+          sudo mv trivy /usr/local/bin/
+          echo "PATH=$PATH:/usr/local/bin" >> $GITHUB_ENV
+          trivy --version  # Verify installation
 
       - name: Scan Docker Image with Trivy
         run: |
-          export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"
           trivy image python-docker-app:latest
 
 
