@@ -1,14 +1,14 @@
-name: Build and Scan Image with Podman
+name: Docker Build and Scan with Trivy (Podman)
 
 on:
   push:
     branches:
-      - main  
-  pull_request:
+      - main
 
 jobs:
-  build-and-scan:
+  build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -18,20 +18,20 @@ jobs:
           sudo apt update
           sudo apt install -y podman
 
-      - name: Install Trivy (Aqua Security Repo)
+      - name: Build Docker Image using Podman
         run: |
-          sudo apt update
-          sudo apt install -y wget gnupg2
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo "deb https://aquasecurity.github.io/trivy-repo/deb stable main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt update
-          sudo apt install -y trivy
+          podman build -t python-docker-app:latest .
+      
+      - name: Install Trivy
+        run: |
+          sudo apt install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
+          tar -xvf trivy_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
 
-      - name: Build Image with Podman
+      - name: Scan Docker Image with Trivy
         run: |
-          podman build -t my-sample-app:latest .
+          trivy image python-docker-app:latest
 
-      - name: Scan Image with Trivy
-        run: |
-          trivy image my-sample-app:latest
+        
 
