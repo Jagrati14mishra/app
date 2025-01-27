@@ -28,7 +28,7 @@ jobs:
         run: |
           podman build -t python-docker-app:latest .
 
-        - name: Install Trivy
+      - name: Install Trivy
         run: |
           sudo apt update
           sudo apt install -y wget curl
@@ -37,10 +37,10 @@ jobs:
           echo "PATH=$PATH:/usr/local/bin" >> $GITHUB_ENV
           trivy --version  # Verify installation
 
-
       - name: Scan Docker Image with Trivy
         run: |
           trivy image python-docker-app:latest
+
 
 
         
