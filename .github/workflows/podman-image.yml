@@ -1,0 +1,27 @@
+name: Build and Scan Image with Podman
+
+on:
+  push:
+    branches:
+      - main  
+  pull_request:
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Podman and Trivy
+        run: |
+          sudo apt update
+          sudo apt install -y podman trivy
+
+      - name: Build Image with Podman
+        run: |
+          podman build -t my-sample-app:latest .
+
+      - name: Scan Image with Trivy
+        run: |
+          trivy image my-sample-app:latest
