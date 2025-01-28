@@ -21,7 +21,7 @@ jobs:
 
       - name: Build Podman Image
         run: |
-          podman build -t localhost/python-podman-app:latest .
+          podman build -t python-podman-app:latest .
 
       - name: Verify Image Exists
         run: |
@@ -47,8 +47,9 @@ jobs:
 
       - name: Scan Podman Image with Trivy
         run: |
-          podman pull localhost/python-podman-app:latest
-          trivy image --input localhost/python-podman-app:latest
+          podman images
+          trivy image python-podman-app:lat
+
 
    
 
