@@ -1,4 +1,4 @@
-name: Docker Build and Scan with Trivy (Podman)
+name: Build and Scan Podman Image
 
 on:
   push:
@@ -8,9 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Install Podman
@@ -18,28 +17,30 @@ jobs:
           sudo apt update
           sudo apt install -y podman
 
-      - name: Configure Podman
+      - name: Build Podman Image
         run: |
-          mkdir -p $HOME/.config/containers
-          echo -e "[engine]\ncgroup_manager = \"cgroupfs\"\nevents_logger = \"file\"" > $HOME/.config/containers/containers.conf
-          systemctl --user enable --now podman
+          podman build -t python-podman-app:latest .
 
-      - name: Build Docker Image using Podman
+  scan:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Install Podman
         run: |
-          podman build -t python-docker-app:latest .
+          sudo apt update
+          sudo apt install -y podman
 
       - name: Install Trivy
         run: |
-          sudo apt update
-          sudo apt install -y wget curl
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh
-          sudo install -m 0755 ./bin/trivy /usr/local/bin/trivy
-          echo "PATH=$PATH:/usr/local/bin" >> $GITHUB_ENV
-          trivy --version  # Verify installation
+          sudo apt install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.49.1_Linux-64bit.tar.gz
+          tar -xvf trivy_0.49.1_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
 
-      - name: Scan Docker Image with Trivy
+      - name: Scan Podman Image with Trivy
         run: |
-          trivy image python-docker-app:latest
+          trivy image python-podman-app:latest
+
 
 
 
