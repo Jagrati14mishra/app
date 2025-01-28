@@ -48,7 +48,7 @@ jobs:
       - name: Scan Podman Image with Trivy
         run: |
           podman images
-          trivy image python-podman-app:lat
+          trivy image python-podman-app:latest
 
 
    
